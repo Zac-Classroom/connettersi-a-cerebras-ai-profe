@@ -1,7 +1,18 @@
 from dotenv import dotenv_values
 import telebot
 from langchain.chat_models import init_chat_model
+from langchain.agents import create_agent
 
+def apri_finestra():
+    """la funzione ha il compito di aprire la finestra di casa tramite un motore ad essa applicato"""
+
+    print("finestra aperta")
+
+def apri_porta():
+    """la funzione ha il compito di aprire la porta di casa tramite un motore"""
+
+    print("porta aperta")
+    
 config=dotenv_values(".env")
 print(config)
 
@@ -13,6 +24,13 @@ llm = init_chat_model(config['MODEL']
         , verbose= True
         , base_url= "https://api.cerebras.ai/v1/") #indirizzo del server di cerebras 
 
+agent = create_agent(
+    model=llm, 
+    tools=[apri_finestra, apri_porta], 
+    system_prompt="Sei un assistente disponibile e amichevole", 
+    debug=True
+)
+
 memoria={}
 formato_memoria= "DOMANDA: {prompt}; RISPOSTA: {risposta}"
 
@@ -23,6 +41,7 @@ CONVERSAZIONI PRECEDENTI:
 {memoria}
 DOMANDA: {prompt}
 """
+
 @bot.message_handler(func=lambda message: True)
 def echo_message(message):
     print(message)
